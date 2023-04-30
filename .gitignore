@@ -1,0 +1,8 @@
+# node modules
+/node_modules
+
+# typescript
+/dist
+
+# test files
+/__tests__
