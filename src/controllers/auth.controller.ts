@@ -78,13 +78,14 @@ const forgotPassword = async (req: Request, res: Response) => {
  * @returns 
  */
 const resetPassword = async (req: Request, res: Response) => {
-    const { resetPasswordToken, newPassword } = req.body;
+    const { password } = req.body;
+    const { token } = req.query;
 
-    const resetPasswordTokenDoc = await getResetPasswordToken(resetPasswordToken);
+    const resetPasswordTokenDoc = await getResetPasswordToken(token as string);
     if(!resetPasswordTokenDoc) {
         return res.status(httpStatus.BAD_REQUEST).send({ message: 'Invalid token' });
     }
-    await UserModel.updateOne({ _id: resetPasswordTokenDoc.user }, { password: newPassword });
+    await UserModel.updateOne({ _id: resetPasswordTokenDoc.user }, { password: password });
     await removeToken(resetPasswordTokenDoc.id);
 
     res.status(httpStatus.OK).send({ message: 'Password reset successfully' });
@@ -113,9 +114,9 @@ const sendVerifyMail = async (req: Request, res: Response) => {
  * @returns 
  */
 const verifyEmail = async (req: Request, res: Response) => {
-    const { verifyEmailToken } = req.body;
+    const { token } = req.query;
 
-    const verifyEmailTokenDoc = await getVerifyEmailToken(verifyEmailToken);
+    const verifyEmailTokenDoc = await getVerifyEmailToken(token as string);
     if(!verifyEmailTokenDoc) {
         return res.status(httpStatus.BAD_REQUEST).send({ message: 'Invalid token' });
     }
