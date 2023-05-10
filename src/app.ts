@@ -3,6 +3,7 @@ import cors from 'cors';
 import passport from 'passport';
 import routes from './routes';
 import { jwtStrategy } from './config/passport';
+import { errorConverter, errorHandler } from './middlewares/error';
 
 const app = express();
 
@@ -34,5 +35,10 @@ app.use(routes);
 app.use((_, res: Response, next) => {
     next(res.status(404).send({ message: 'Not Found' }));
 });
+
+// error middlewares
+app.use(errorConverter);
+
+app.use(errorHandler);
 
 export { app };
