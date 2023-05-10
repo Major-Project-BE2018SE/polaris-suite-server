@@ -1,11 +1,13 @@
 import jwt from 'jsonwebtoken';
 import httpStatus from 'http-status';
-import moment, { Moment } from 'moment';
+import moment from 'moment';
+import type { Moment } from 'moment';
+import type { ObjectId } from 'mongoose';
+import type { Response } from 'express';
+
 import { TokenModel, UserModel } from '../models';
-import { ObjectId } from 'mongoose';
 import { tokenTypes } from '../config/constant';
 import { config } from '../config/config';
-import { Response } from 'express';
 
 /**
  * 
