@@ -6,3 +6,8 @@
 
 # test files
 /__tests__
+/thunder-tests
+
+# env files
+.env
+!.env.example
