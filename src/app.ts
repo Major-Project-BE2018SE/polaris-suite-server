@@ -1,9 +1,13 @@
-import express, { Response } from 'express';
+// package imports
 import cors from 'cors';
-import passport from 'passport';
 import routes from './routes';
+import passport from 'passport';
+import express, { Response } from 'express';
 import { jwtStrategy } from './config/passport';
+
+// custom imports
 import { errorConverter, errorHandler } from './middlewares/error';
+import ApiError from './helpers/ApiError';
 
 const app = express();
 
@@ -32,8 +36,8 @@ passport.use('jwt', jwtStrategy);
 app.use(routes);
 
 // send back a 404 error for any unknown api request
-app.use((_, res: Response, next) => {
-    next(res.status(404).send({ message: 'Not Found' }));
+app.use((_, __: Response, next) => {
+    next(new ApiError(404, 'Not found'));
 });
 
 // error middlewares
