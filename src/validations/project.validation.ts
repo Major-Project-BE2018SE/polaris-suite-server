@@ -10,6 +10,8 @@ const createProject = {
             id: Joi.string().required().custom(objectId),
             role: Joi.string().valid("tester", "developer", "stakeholder").required(),
         })).optional(),
+        environments: Joi.array().items(Joi.custom(objectId)).optional(),
+        status: Joi.string().valid("in progress", "hold", "draft", "archived", "done").optional(),
     }),
 };
 
@@ -24,6 +26,8 @@ const updateProject = {
             id: Joi.string().optional().custom(objectId),
             role: Joi.string().valid("tester", "developer", "stakeholder").required(),
         })).optional(),
+        environments: Joi.array().items(Joi.custom(objectId)).optional(),
+        status: Joi.string().valid("in progress", "hold", "draft", "archived", "done").optional(),
     }).min(1),
 };
 
@@ -48,10 +52,18 @@ const getProjects = {
     }),
 };
 
+const removeMember = {
+    params: Joi.object().keys({
+        projectId: Joi.string().required().custom(objectId),
+        memberId: Joi.string().required().custom(objectId),
+    }),
+};
+
 export {
     createProject,
     updateProject,
     deleteProject,
     getProject,
     getProjects,
+    removeMember,
 };

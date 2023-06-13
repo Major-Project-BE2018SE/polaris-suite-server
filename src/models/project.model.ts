@@ -5,6 +5,16 @@ interface IProjectSchema extends mongoose.Document {
     description: string;
     ownerID: string;
     members: string[];
+    status: string;
+    environments: {
+        name: string;
+        description: string;
+        slug: string;
+        variables: {
+            name: string;
+            value: string;
+        }[];
+    }[];
 }
 
 const ProjectSchema = new mongoose.Schema({
@@ -32,6 +42,18 @@ const ProjectSchema = new mongoose.Schema({
         }],
         ref: "User",
         default: [],
+    },
+    environments: {
+        type: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Environment",
+        }],
+        default: [],
+    },
+    status: {
+        type: String,
+        enum: ["archieved", "hold", "in progress", "done", "draft"],
+        default: "draft",
     }
 }, {
     timestamps: true,
