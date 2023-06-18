@@ -19,6 +19,6 @@
     "noImplicitThis": false,
     "strictNullChecks": false                       /* Skip type checking all .d.ts files. */
   },
-  "include": ["src/**/*", "__tests__/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "thunder-tests"],
 }
