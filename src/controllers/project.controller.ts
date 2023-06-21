@@ -12,7 +12,7 @@ const projectCreate = catchAsync(async (req: Request, res: Response) => {
 });
 
 const projectGet = catchAsync(async (req: Request, res: Response) => {
-    const project = await ProjectModel.findById(req.params.projectId);
+    const project = await ProjectModel.findById(req.params.projectId).populate('environments');
 
     if(!project) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');

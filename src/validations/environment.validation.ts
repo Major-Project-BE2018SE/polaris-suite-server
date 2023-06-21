@@ -9,7 +9,7 @@ const createEnvironment = {
         name: Joi.string().required(),
         description: Joi.string().optional(),
         variables: Joi.array().items(Joi.object({
-            key: Joi.string().required(),
+            name: Joi.string().required(),
             value: Joi.string().required(),
         })).optional(),
     }),
@@ -24,7 +24,7 @@ const updateEnvironment = {
         name: Joi.string().optional(),
         description: Joi.string().optional(),
         variables: Joi.array().items(Joi.object({
-            key: Joi.string().required(),
+            name: Joi.string().required(),
             value: Joi.string().required(),
         })).optional(),
     }).min(1),
