@@ -55,9 +55,21 @@ const getProjects = {
 const removeMember = {
     params: Joi.object().keys({
         projectId: Joi.string().required().custom(objectId),
-        memberId: Joi.string().required().custom(objectId),
+    }),
+    body: Joi.object().keys({
+        email: Joi.string().required(),
     }),
 };
+
+const projectMember = {
+    params: Joi.object().keys({
+        projectId: Joi.string().required().custom(objectId),
+    }),
+    body: Joi.object().keys({
+        email: Joi.string().required(),
+        role: Joi.string().valid("tester", "developer", "stakeholder").required(),
+    }),
+}
 
 export {
     createProject,
@@ -66,4 +78,5 @@ export {
     getProject,
     getProjects,
     removeMember,
+    projectMember,
 };

@@ -51,10 +51,38 @@ const projectUpdate = catchAsync(async (req: Request, res: Response) => {
     res.status(httpStatus.OK).send({ project });
 });
 
+const projectInvite = catchAsync(async (req: Request, res: Response) => {
+    const project = await ProjectModel.findById(req.params.projectId);
+
+    if(!project) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
+    }
+
+    project.members.push(req.body);
+    await project.save();
+
+    res.status(httpStatus.OK).send({ project });
+});
+
+const projectMemberRemove = catchAsync(async (req: Request, res: Response) => {
+    const project = await ProjectModel.findById(req.params.projectId);
+
+    if(!project) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
+    }
+
+    project.members = project.members.filter(member => member.email !== req.body.email);
+    await project.save();
+
+    res.status(httpStatus.OK).send({ project });
+});
+
 export {
     projectCreate,
     projectGet,
     projectsGet,
     projectDelete,
     projectUpdate,
+    projectInvite,
+    projectMemberRemove,
 }

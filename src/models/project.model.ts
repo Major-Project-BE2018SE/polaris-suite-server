@@ -4,7 +4,7 @@ interface IProjectSchema extends mongoose.Document {
     name: string;
     description: string;
     ownerID: string;
-    members: string[];
+    members: {email: string, role: "tester" | "developer" | "stakeholder", status: "accepted" | "pending" | "declined"}[];
     status: string;
     environments: {
         name: string;
@@ -34,13 +34,22 @@ const ProjectSchema = new mongoose.Schema({
     },
     members: {
         type: [{ 
-            id: mongoose.Schema.Types.ObjectId, 
+            email: {
+                type: String,
+                unique: true,
+                required: true,
+            }, 
             role: { 
                 type: String, 
-                enum: ["tester", "developer", "stakeholder"] 
+                enum: ["tester", "developer", "stakeholder"],
+                required: true, 
+            },
+            status: {
+                type: String,
+                enum: ["pending", "accepted", "declined"],
+                default: "pending",
             } 
         }],
-        ref: "User",
         default: [],
     },
     environments: {
