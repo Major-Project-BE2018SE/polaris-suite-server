@@ -58,6 +58,10 @@ const projectInvite = catchAsync(async (req: Request, res: Response) => {
         throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
     }
 
+    if(project.members.find(member => member.email === req.body.email)) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'User already invited');
+    }
+
     project.members.push(req.body);
     await project.save();
 

@@ -36,7 +36,6 @@ const ProjectSchema = new mongoose.Schema({
         type: [{ 
             email: {
                 type: String,
-                unique: true,
                 required: true,
             }, 
             role: { 
