@@ -4,6 +4,8 @@ import type { Request, Response } from "express";
 import { ProjectModel } from "../models";
 import { catchAsync } from "../helpers/catchAsync";
 import ApiError from "../helpers/ApiError";
+import { sendEmail } from "../helpers/mailer";
+import { config } from "../config/config";
 
 const projectCreate = catchAsync(async (req: Request, res: Response) => {   
     const project = await ProjectModel.create(req.body);
@@ -57,6 +59,13 @@ const projectInvite = catchAsync(async (req: Request, res: Response) => {
     if(!project) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
     }
+
+    const acceptUrl = `${config.frontendUrl}/accept-invitation?projectId=${project._id}&email=${req.body.email}`;
+    const body = `Dear user,
+    You have been invited to project ${project.name} as ${req.body.role}.
+    To accept the invitation, click on this link: <a href="${acceptUrl}">${acceptUrl}</a>`;
+    
+    await sendEmail(req.body.email, 'Invitation to project', body);
 
     project.members.push(req.body);
     await project.save();
