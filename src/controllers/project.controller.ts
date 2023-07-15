@@ -7,7 +7,7 @@ import ApiError from "../helpers/ApiError";
 import { sendEmail } from "../helpers/mailer";
 import { config } from "../config/config";
 
-const projectCreate = catchAsync(async (req: Request, res: Response) => {   
+const projectCreate = catchAsync(async (req: Request, res: Response) => {
     const project = await ProjectModel.create(req.body);
 
     res.status(httpStatus.CREATED).json({ project });
@@ -23,8 +23,8 @@ const projectGet = catchAsync(async (req: Request, res: Response) => {
     res.status(httpStatus.OK).send({ project });
 });
 
-const projectsGet = catchAsync(async (_: Request, res: Response) => {
-    const projects = await ProjectModel.find({});
+const projectsGet = catchAsync(async (req: Request, res: Response) => {
+    const projects = req.query.status === "all" ? await ProjectModel.find({}) : await ProjectModel.find({ status: { $ne: 'archieved' } });
     res.status(httpStatus.OK).send({ projects });
 });
 

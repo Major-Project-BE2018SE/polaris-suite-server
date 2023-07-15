@@ -29,7 +29,7 @@ const updateProject = {
             status: Joi.string().valid("pending", "accepted", "declined").optional(),
         })).optional(),
         environments: Joi.array().items(Joi.custom(objectId)).optional(),
-        status: Joi.string().valid("in progress", "hold", "draft", "archived", "done").optional(),
+        status: Joi.string().valid("in progress", "hold", "draft", "archieved", "done").optional(),
     }).min(1),
 };
 
@@ -51,6 +51,7 @@ const getProjects = {
         sortBy: Joi.string(),
         limit: Joi.number().integer(),
         page: Joi.number().integer(),
+        status: Joi.string(),
     }),
 };
 
