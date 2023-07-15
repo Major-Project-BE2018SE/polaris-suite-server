@@ -23,8 +23,10 @@ const updateProject = {
         name: Joi.string().optional(),
         description: Joi.string().optional(),
         members: Joi.array().items(Joi.object({
-            id: Joi.string().optional().custom(objectId),
+            _id: Joi.string().optional().custom(objectId),
             role: Joi.string().valid("tester", "developer", "stakeholder").required(),
+            email: Joi.string().optional(),
+            status: Joi.string().valid("pending", "accepted", "declined").optional(),
         })).optional(),
         environments: Joi.array().items(Joi.custom(objectId)).optional(),
         status: Joi.string().valid("in progress", "hold", "draft", "archived", "done").optional(),
