@@ -48,7 +48,7 @@ const projectUpdate = catchAsync(async (req: Request, res: Response) => {
   }
 
   Object.assign(project, req.body);
-  await project.save();
+  await project.save().then((project) => project.populate('environments'));
 
   res.status(httpStatus.OK).send({ project });
 });
