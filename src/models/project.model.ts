@@ -9,7 +9,6 @@ interface IProjectSchema extends mongoose.Document {
   environments: {
     name: string;
     description: string;
-    slug: string;
     variables: {
       name: string;
       value: string;
