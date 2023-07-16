@@ -8,90 +8,98 @@ import { sendEmail } from "../helpers/mailer";
 import { config } from "../config/config";
 
 const projectCreate = catchAsync(async (req: Request, res: Response) => {
-    const project = await ProjectModel.create(req.body);
+  const project = await ProjectModel.create(req.body);
 
-    res.status(httpStatus.CREATED).json({ project });
+  res.status(httpStatus.CREATED).json({ project });
 });
 
 const projectGet = catchAsync(async (req: Request, res: Response) => {
-    const project = await ProjectModel.findById(req.params.projectId).populate('environments');
+  const project = await ProjectModel.findById(req.params.projectId).populate('environments');
 
-    if(!project) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
-    }
-    
-    res.status(httpStatus.OK).send({ project });
+  if(!project) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
+  }
+
+  res.status(httpStatus.OK).send({ project });
 });
 
 const projectsGet = catchAsync(async (req: Request, res: Response) => {
-    const projects = req.query.status === "all" ? await ProjectModel.find({}) : await ProjectModel.find({ status: { $ne: 'archieved' } });
-    res.status(httpStatus.OK).send({ projects });
+  const projects = req.query.status === "all" ? await ProjectModel.find({}) : await ProjectModel.find({ status: { $ne: 'archieved' } });
+  res.status(httpStatus.OK).send({ projects });
 });
 
 const projectDelete = catchAsync(async (req: Request, res: Response) => {
-    const project = await ProjectModel.findById(req.params.projectId);
+  const project = await ProjectModel.findById(req.params.projectId);
 
-    if(!project) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
-    }
+  if(!project) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
+  }
 
-    await project.deleteOne();
+  await project.deleteOne();
 
-    res.status(httpStatus.OK).send({ message: 'Deleted successfully' });    
+  res.status(httpStatus.OK).send({ message: 'Deleted successfully' });    
 });
 
 const projectUpdate = catchAsync(async (req: Request, res: Response) => {
-    const project = await ProjectModel.findById(req.params.projectId);
+  const project = await ProjectModel.findById(req.params.projectId);
 
-    if(!project) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
-    }
+  if(!project) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
+  }
 
-    Object.assign(project, req.body);
-    await project.save();
+  Object.assign(project, req.body);
+  await project.save();
 
-    res.status(httpStatus.OK).send({ project });
+  res.status(httpStatus.OK).send({ project });
 });
 
 const projectInvite = catchAsync(async (req: Request, res: Response) => {
-    const project = await ProjectModel.findById(req.params.projectId);
+  const project = await ProjectModel.findById(req.params.projectId);
 
-    if(!project) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
-    }
+  if(!project) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
+  }
 
-    const acceptUrl = `${config.frontendUrl}/accept-invitation?projectId=${project._id}&email=${req.body.email}`;
-    const body = `Dear user,
-    You have been invited to project ${project.name} as ${req.body.role}.
-    To accept the invitation, click on this link: <a href="${acceptUrl}">${acceptUrl}</a>`;
-    
-    await sendEmail(req.body.email, 'Invitation to project', body);
+  if(project.members.find(member => member.email === req.body.email)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'User already invited');
+  }
 
-    project.members.push(req.body);
-    await project.save();
+  const acceptUrl = `${config.frontendUrl}/accept-invitation?projectId=${project._id}&email=${req.body.email}`;
+  const body = `Dear user,
+  You have been invited to project ${project.name} as ${req.body.role}.
+  To accept the invitation, click on this link: <a href="${acceptUrl}">${acceptUrl}</a>`;
 
-    res.status(httpStatus.OK).send({ project });
+  await sendEmail(req.body.email, 'Invitation to project', body);
+
+  project.members.push(req.body);
+  await project.save();
+
+  res.status(httpStatus.OK).send({ project });
 });
 
 const projectMemberRemove = catchAsync(async (req: Request, res: Response) => {
-    const project = await ProjectModel.findById(req.params.projectId);
+  const project = await ProjectModel.findById(req.params.projectId);
 
-    if(!project) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
-    }
+  if(!project) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
+  }
 
-    project.members = project.members.filter(member => member.email !== req.body.email);
-    await project.save();
+  if(!project.members.find(member => member.email === req.body.email)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'User found in the project');
+  }
 
-    res.status(httpStatus.OK).send({ project });
+  project.members = project.members.filter(member => member.email !== req.body.email);
+  await project.save();
+
+  res.status(httpStatus.OK).send({ project });
 });
 
 export {
-    projectCreate,
-    projectGet,
-    projectsGet,
-    projectDelete,
-    projectUpdate,
-    projectInvite,
-    projectMemberRemove,
+  projectCreate,
+  projectGet,
+  projectsGet,
+  projectDelete,
+  projectUpdate,
+  projectInvite,
+  projectMemberRemove,
 }
