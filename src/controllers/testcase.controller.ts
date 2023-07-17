@@ -1,7 +1,7 @@
 import httpStatus from "http-status";
 import type { Request, Response } from "express";
 
-import { ProjectModel, TestCaseModel } from "../models";
+import { CommentModel, ProjectModel, TestCaseModel } from "../models";
 import { catchAsync } from "../helpers/catchAsync";
 import ApiError from "../helpers/ApiError";
 
@@ -35,7 +35,23 @@ const testCaseAllCreate = catchAsync(async (req: Request, res: Response) => {
 });
 
 const testCaseGet = catchAsync(async (req: Request, res: Response) => {
-  const testcase = await TestCaseModel.findById(req.params.testcaseId);
+  const testcase = await TestCaseModel.findById(req.params.testcaseId)
+    .then(testcase => testcase.populate({
+      path: 'comments',
+      populate: [
+        { 
+          path: 'userId',
+          model: 'User',
+        },
+        {
+          path: 'replies',
+          populate: {
+            path: 'userId',
+            model: 'User',
+          }
+        }
+      ],
+    }));
 
   if(!testcase) {
     throw new ApiError(httpStatus.NOT_FOUND, 'TestCase not found');
@@ -61,22 +77,42 @@ const testCaseDelete = catchAsync(async (req: Request, res: Response) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'TestCase not found');
   }
 
+  for (let i = 0; i < testCase.comments.length; i++) {
+    await CommentModel.findByIdAndDelete(testCase.comments[i]);
+  }
+
   await testCase.deleteOne();
 
   res.status(httpStatus.OK).send({ message: 'Deleted successfully' });    
 });
 
 const testCaseUpdate = catchAsync(async (req: Request, res: Response) => {
-  const testCase = await TestCaseModel.findById(req.params.testcaseId);
+  const testcase = await TestCaseModel.findById(req.params.testcaseId);
 
-  if(!testCase) {
+  if(!testcase) {
     throw new ApiError(httpStatus.NOT_FOUND, 'TestCase not found');
   }
 
-  Object.assign(testCase, req.body);
-  await testCase.save();
+  Object.assign(testcase, req.body);
+  await testcase.save().then(testcase => testcase
+    .populate({
+      path: 'comments',
+      populate: [
+        { 
+          path: 'userId',
+          model: 'User',
+        },
+        {
+          path: 'replies',
+          populate: {
+            path: 'userId',
+            model: 'User',
+          }
+        }
+      ],
+    }));
 
-  res.status(httpStatus.OK).send({ testCase });
+  res.status(httpStatus.OK).send({ testcase });
 });
 
 export {

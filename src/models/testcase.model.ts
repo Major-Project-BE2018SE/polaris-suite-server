@@ -25,6 +25,7 @@ interface ITestCaseSchema extends mongoose.Document {
     }[] | null;
     returns: string | number | boolean | Array<any> | Object | null | undefined;
   }[];
+  comments: string[];
   createdAt: Date;
   updatedAt: Date;
 }
