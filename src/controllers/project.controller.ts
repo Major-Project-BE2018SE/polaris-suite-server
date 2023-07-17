@@ -65,13 +65,55 @@ const projectInvite = catchAsync(async (req: Request, res: Response) => {
   }
 
   const acceptUrl = `${config.frontendUrl}/accept-invitation?projectId=${project._id}&email=${req.body.email}`;
+  const declineUrl = `${config.frontendUrl}/decline-invitation?projectId=${project._id}&email=${req.body.email}`;
+
   const body = `Dear user,
   You have been invited to project ${project.name} as ${req.body.role}.
-  To accept the invitation, click on this link: <a href="${acceptUrl}">${acceptUrl}</a>`;
+  To accept the invitation, click on this link: <a href="${acceptUrl}">${acceptUrl}</a>. To decline the invitation,
+  click on this link: <a href="${declineUrl}">${declineUrl}</a>`;
 
   await sendEmail(req.body.email, 'Invitation to project', body);
 
   project.members.push(req.body);
+  await project.save();
+
+  res.status(httpStatus.OK).send({ project });
+});
+
+const projectInviteAccept = catchAsync(async (req: Request, res: Response) => {
+  const project = await ProjectModel.findById(req.params.projectId);
+
+  if(!project) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
+  }
+
+  if(project.members.find(member => (member.email === req.body.email && member.status === "accepted"))) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'User has already accepted the invitation');
+  }
+
+  if(req.query.accept === "false" && project.members.find(member => (member.email === req.body.email && member.status === "declined"))) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'User has already declined the invitation');
+  }
+
+  let newMembersStatus = project.members;
+
+  if(req.query.accept && req.query.accept === "false") {
+    newMembersStatus = project.members.map(member => {
+      if(member.email === req.body.email) {
+        member.status = "declined";
+      }
+      return member;
+    });
+  }else {
+    newMembersStatus = project.members.map(member => {
+      if(member.email === req.body.email) {
+        member.status = "accepted";
+      }
+      return member;
+    });
+  }
+  
+  project.members = newMembersStatus;
   await project.save();
 
   res.status(httpStatus.OK).send({ project });
@@ -102,4 +144,5 @@ export {
   projectUpdate,
   projectInvite,
   projectMemberRemove,
+  projectInviteAccept,
 }
