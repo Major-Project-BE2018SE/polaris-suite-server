@@ -6,6 +6,7 @@ import { config } from '../config/config';
 import authRoute from './auth.route';
 import projectRoute from './project.route';
 import environmentRoute from './environment.route';
+import testcaseRoute from './testcase.route';
 
 const router = express.Router();
 
@@ -16,6 +17,7 @@ router.get('/', function (_, res: Response) {
 router.use('/auth', authRoute);
 router.use('/projects', projectRoute);
 router.use('/environments', environmentRoute);
+router.use('/testcases', testcaseRoute);
 
 /* istanbul ignore next */
 // eslint-disable-next-line no-empty

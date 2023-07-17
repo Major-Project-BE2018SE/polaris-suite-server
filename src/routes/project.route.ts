@@ -7,22 +7,22 @@ import { projectCreate, projectDelete, projectGet, projectInvite, projectMemberR
 const router = express.Router();
 
 router.route('/')
-    .post(auth(), validate(createProject), projectCreate)
-    .get(auth(), validate(getProjects), projectsGet);
+  .post(auth(), validate(createProject), projectCreate)
+  .get(auth(), validate(getProjects), projectsGet);
 
 router.route('/:projectId')
-    .get(auth(), validate(getProject), projectGet)
-    .delete(auth(), validate(deleteProject), projectDelete)
-    .patch(auth(), validate(updateProject), projectUpdate);
+  .get(auth(), validate(getProject), projectGet)
+  .delete(auth(), validate(deleteProject), projectDelete)
+  .patch(auth(), validate(updateProject), projectUpdate);
 
 router.route('/:projectId/invite')
-    .patch(auth(), validate(projectMember), projectInvite);
+  .patch(auth(), validate(projectMember), projectInvite);
 
 router.route('/:projectId/invite/accept')
-    .patch(auth(), validate(projectMember), projectUpdate);
+  .patch(auth(), validate(projectMember), projectUpdate);
 
 router.route('/:projectId/members/remove')
-    .patch(auth(), validate(removeMember), projectMemberRemove);
+  .patch(auth(), validate(removeMember), projectMemberRemove);
 
 
 export default router;
