@@ -8,6 +8,7 @@ import projectRoute from './project.route';
 import environmentRoute from './environment.route';
 import testcaseRoute from './testcase.route';
 import commentRoute from './comment.route';
+import activitiesRoute from './activities.route';
 
 const router = express.Router();
 
@@ -20,6 +21,7 @@ router.use('/projects', projectRoute);
 router.use('/environments', environmentRoute);
 router.use('/testcases', testcaseRoute);
 router.use('/comments', commentRoute);
+router.use('/activities', activitiesRoute);
 
 /* istanbul ignore next */
 // eslint-disable-next-line no-empty
