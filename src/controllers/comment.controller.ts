@@ -1,9 +1,10 @@
 import httpStatus from "http-status";
 import type { Request, Response } from "express";
 
-import { CommentModel, TestCaseModel } from "../models";
+import { CommentModel, TestCaseModel, UserModel } from "../models";
 import { catchAsync } from "../helpers/catchAsync";
 import ApiError from "../helpers/ApiError";
+import { activitiesCreate } from "./activities.controller";
 
 const commentCreate = catchAsync(async (req: Request, res: Response) => {
   const testcase = await TestCaseModel.findById(req.params.testcaseId);
@@ -13,8 +14,20 @@ const commentCreate = catchAsync(async (req: Request, res: Response) => {
   }
 
   const comment = await CommentModel.create(req.body);
+  const user = await UserModel.findById(req.body.userId);
 
   testcase.comments.push(comment._id);
+  
+  await activitiesCreate(
+    "test-case", 
+    "comment", 
+    `New Comment`, 
+    `${user.name} commented on the testcase ${testcase.name}`, 
+    `/polaris/projects/${testcase.linkedProject}/testcase/${testcase.environment}/${testcase._id}`, 
+    testcase.linkedProject,
+    testcase._id,
+  );
+
   await testcase.save().then(testcase => testcase
     .populate([
       {

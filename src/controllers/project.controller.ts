@@ -6,9 +6,19 @@ import { catchAsync } from "../helpers/catchAsync";
 import ApiError from "../helpers/ApiError";
 import { sendEmail } from "../helpers/mailer";
 import { config } from "../config/config";
+import { activitiesCreate } from "./activities.controller";
 
 const projectCreate = catchAsync(async (req: Request, res: Response) => {
   const project = await ProjectModel.create(req.body);
+
+  await activitiesCreate(
+    "project", 
+    "project-create", 
+    `Create a new project ${project.name}`, 
+    `A new project ${project.name} has been created`, 
+    `/polaris/projects/${project._id}`, 
+    project._id,
+  );
 
   res.status(httpStatus.CREATED).json({ project });
 });
@@ -34,6 +44,15 @@ const projectDelete = catchAsync(async (req: Request, res: Response) => {
   if(!project) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
   }
+
+  await activitiesCreate(
+    "project", 
+    "project-delete", 
+    `Removed a project ${project.name}`, 
+    `Project ${project.name} has been deleted`, 
+    `/polaris/projects`, 
+    project._id,
+  );
 
   await project.deleteOne();
 
@@ -76,6 +95,15 @@ const projectInvite = catchAsync(async (req: Request, res: Response) => {
 
   project.members.push(req.body);
   await project.save();
+
+  await activitiesCreate(
+    "project", 
+    "collaborator-add", 
+    `Collaborator Added`, 
+    `A new collaborator has been added to the project ${project.name}`, 
+    `/polaris/projects/${project._id}/settings`, 
+    project._id,
+  );
 
   res.status(httpStatus.OK).send({ project });
 });
@@ -132,6 +160,15 @@ const projectMemberRemove = catchAsync(async (req: Request, res: Response) => {
 
   project.members = project.members.filter(member => member.email !== req.body.email);
   await project.save();
+
+  await activitiesCreate(
+    "project", 
+    "collaborator-remove", 
+    `Collaborator Removed`, 
+    `Collaborator ${req.body.email} has been removed from the project ${project.name}`, 
+    `/polaris/projects/${project._id}/settings`, 
+    project._id,
+  );
 
   res.status(httpStatus.OK).send({ project });
 });
