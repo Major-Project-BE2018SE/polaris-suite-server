@@ -36,22 +36,32 @@ const testCaseAllCreate = catchAsync(async (req: Request, res: Response) => {
 
 const testCaseGet = catchAsync(async (req: Request, res: Response) => {
   const testcase = await TestCaseModel.findById(req.params.testcaseId)
-    .then(testcase => testcase.populate({
-      path: 'comments',
-      populate: [
-        { 
-          path: 'userId',
-          model: 'User',
-        },
-        {
-          path: 'replies',
-          populate: {
+    .then(testcase => testcase.populate([
+      {
+        path: 'comments',
+        populate: [
+          { 
             path: 'userId',
             model: 'User',
+          },
+          {
+            path: 'replies',
+            populate: {
+              path: 'userId',
+              model: 'User',
+            }
           }
-        }
-      ],
-    }));
+        ],
+      },
+      {
+        path: 'environment',
+        model: 'Environment',
+      },
+      {
+        path: 'linkedProject',
+        model: 'Project',
+      }
+    ]));
 
   if(!testcase) {
     throw new ApiError(httpStatus.NOT_FOUND, 'TestCase not found');
@@ -95,22 +105,32 @@ const testCaseUpdate = catchAsync(async (req: Request, res: Response) => {
 
   Object.assign(testcase, req.body);
   await testcase.save().then(testcase => testcase
-    .populate({
-      path: 'comments',
-      populate: [
-        { 
-          path: 'userId',
-          model: 'User',
-        },
-        {
-          path: 'replies',
-          populate: {
+    .populate([
+      {
+        path: 'comments',
+        populate: [
+          { 
             path: 'userId',
             model: 'User',
+          },
+          {
+            path: 'replies',
+            populate: {
+              path: 'userId',
+              model: 'User',
+            }
           }
-        }
-      ],
-    }));
+        ],
+      },
+      {
+        path: 'environment',
+        model: 'Environment',
+      },
+      {
+        path: 'linkedProject',
+        model: 'Project',
+      }
+    ]));
 
   res.status(httpStatus.OK).send({ testcase });
 });

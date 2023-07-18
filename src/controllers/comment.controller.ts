@@ -16,22 +16,32 @@ const commentCreate = catchAsync(async (req: Request, res: Response) => {
 
   testcase.comments.push(comment._id);
   await testcase.save().then(testcase => testcase
-    .populate({
-      path: 'comments',
-      populate: [
-        { 
-          path: 'userId',
-          model: 'User',
-        },
-        {
-          path: 'replies',
-          populate: {
+    .populate([
+      {
+        path: 'comments',
+        populate: [
+          { 
             path: 'userId',
             model: 'User',
+          },
+          {
+            path: 'replies',
+            populate: {
+              path: 'userId',
+              model: 'User',
+            }
           }
-        }
-      ],
-    }));
+        ],
+      },
+      {
+        path: 'environment',
+        model: 'Environment',
+      },
+      {
+        path: 'linkedProject',
+        model: 'Project',
+      }
+    ]));
 
   res.status(httpStatus.CREATED).json({ testcase });
 });
@@ -44,22 +54,32 @@ const commentDelete = catchAsync(async (req: Request, res: Response) => {
   }
 
   const testcase = await TestCaseModel.findById(req.params.testcaseId)
-    .then(testcase => testcase.populate({
-      path: 'comments',
-      populate: [
-        { 
-          path: 'userId',
-          model: 'User',
-        },
-        {
-          path: 'replies',
-          populate: {
+    .then(testcase => testcase.populate([
+      {
+        path: 'comments',
+        populate: [
+          { 
             path: 'userId',
             model: 'User',
+          },
+          {
+            path: 'replies',
+            populate: {
+              path: 'userId',
+              model: 'User',
+            }
           }
-        }
-      ],
-    }));
+        ],
+      },
+      {
+        path: 'environment',
+        model: 'Environment',
+      },
+      {
+        path: 'linkedProject',
+        model: 'Project',
+      }
+    ]));
 
   if(!testcase) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Testcase not found');
@@ -89,22 +109,32 @@ const commentUpdate = catchAsync(async (req: Request, res: Response) => {
   await comment.save().then(comment => comment.populate('replies'));
 
   const testcase = await TestCaseModel.findById(req.params.testcaseId)
-    .then(testcase => testcase.populate({
-      path: 'comments',
-      populate: [
-        { 
-          path: 'userId',
-          model: 'User',
-        },
-        {
-          path: 'replies',
-          populate: {
+    .then(testcase => testcase.populate([
+      {
+        path: 'comments',
+        populate: [
+          { 
             path: 'userId',
             model: 'User',
+          },
+          {
+            path: 'replies',
+            populate: {
+              path: 'userId',
+              model: 'User',
+            }
           }
-        }
-      ],
-    }));
+        ],
+      },
+      {
+        path: 'environment',
+        model: 'Environment',
+      },
+      {
+        path: 'linkedProject',
+        model: 'Project',
+      }
+    ]));
 
   res.status(httpStatus.OK).send({ testcase });
 });
@@ -122,22 +152,32 @@ const replyToComment = catchAsync(async (req: Request, res: Response) => {
   await comment.save().then(comment => comment.populate('replies'));
 
   const testcase = await TestCaseModel.findById(req.params.testcaseId)
-    .then(testcase => testcase.populate({
-      path: 'comments',
-      populate: [
-        { 
-          path: 'userId',
-          model: 'User',
-        },
-        {
-          path: 'replies',
-          populate: {
+    .then(testcase => testcase.populate([
+      {
+        path: 'comments',
+        populate: [
+          { 
             path: 'userId',
             model: 'User',
+          },
+          {
+            path: 'replies',
+            populate: {
+              path: 'userId',
+              model: 'User',
+            }
           }
-        }
-      ],
-    }));
+        ],
+      },
+      {
+        path: 'environment',
+        model: 'Environment',
+      },
+      {
+        path: 'linkedProject',
+        model: 'Project',
+      }
+    ]));
 
   res.status(httpStatus.OK).send({ testcase });
 });
@@ -158,22 +198,32 @@ const replyDelete = catchAsync(async (req: Request, res: Response) => {
   await reply.deleteOne();
 
   const testcase = await TestCaseModel.findById(req.params.testcaseId)
-    .then(testcase => testcase.populate({
-      path: 'comments',
-      populate: [
-        { 
-          path: 'userId',
-          model: 'User',
-        },
-        {
-          path: 'replies',
-          populate: {
+    .then(testcase => testcase.populate([
+      {
+        path: 'comments',
+        populate: [
+          { 
             path: 'userId',
             model: 'User',
+          },
+          {
+            path: 'replies',
+            populate: {
+              path: 'userId',
+              model: 'User',
+            }
           }
-        }
-      ],
-    }));
+        ],
+      },
+      {
+        path: 'environment',
+        model: 'Environment',
+      },
+      {
+        path: 'linkedProject',
+        model: 'Project',
+      }
+    ]));
 
   res.status(httpStatus.OK).send({ testcase });
 });
@@ -189,22 +239,32 @@ const likeComment = catchAsync(async (req: Request, res: Response) => {
   await comment.save();
 
   const testcase = await TestCaseModel.findById(req.params.testcaseId)
-    .then(testcase => testcase.populate({
-      path: 'comments',
-      populate: [
-        { 
-          path: 'userId',
-          model: 'User',
-        },
-        {
-          path: 'replies',
-          populate: {
+    .then(testcase => testcase.populate([
+      {
+        path: 'comments',
+        populate: [
+          { 
             path: 'userId',
             model: 'User',
+          },
+          {
+            path: 'replies',
+            populate: {
+              path: 'userId',
+              model: 'User',
+            }
           }
-        }
-      ],
-    }));
+        ],
+      },
+      {
+        path: 'environment',
+        model: 'Environment',
+      },
+      {
+        path: 'linkedProject',
+        model: 'Project',
+      }
+    ]));
 
   res.status(httpStatus.OK).send({ testcase });
 });
@@ -221,22 +281,32 @@ const unlikeComment = catchAsync(async (req: Request, res: Response) => {
   await comment.save();
 
   const testcase = await TestCaseModel.findById(req.params.testcaseId)
-    .then(testcase => testcase.populate({
-      path: 'comments',
-      populate: [
-        { 
-          path: 'userId',
-          model: 'User',
-        },
-        {
-          path: 'replies',
-          populate: {
+    .then(testcase => testcase.populate([
+      {
+        path: 'comments',
+        populate: [
+          { 
             path: 'userId',
             model: 'User',
+          },
+          {
+            path: 'replies',
+            populate: {
+              path: 'userId',
+              model: 'User',
+            }
           }
-        }
-      ],
-    }));
+        ],
+      },
+      {
+        path: 'environment',
+        model: 'Environment',
+      },
+      {
+        path: 'linkedProject',
+        model: 'Project',
+      }
+    ]));
 
   res.status(httpStatus.OK).send({ testcase });
 });
