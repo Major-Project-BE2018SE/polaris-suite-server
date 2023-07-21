@@ -16,14 +16,16 @@ import ApiError from "../helpers/ApiError";
  * @returns 
  */
 const register = catchAsync(async (req: Request, res: Response) => {   
-    if(await UserModel.isEmailTaken(req.body.email)) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
-    }
+  if(await UserModel.isEmailTaken(req.body.email)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+  }
 
-    const user = await UserModel.create(req.body);
-    const token = await generateAuthTokens(user.id);
+  const user = await UserModel.create(req.body);
+  const token = await generateAuthTokens(user.id);
 
-    res.status(httpStatus.CREATED).json({ user, token });
+  await sendEmail(user.email, token.refresh.token, emailTypes.VERIFY_EMAIL);
+
+  res.status(httpStatus.CREATED).json({ user, token });
 });
 
 /**
@@ -34,16 +36,16 @@ const register = catchAsync(async (req: Request, res: Response) => {
  * @returns 
  */
 const login = catchAsync(async (req: Request, res: Response) => {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    const user = await UserModel.findOne({ email });
-    if(!user || !(await user.isPasswordVerified(password))) {
-        throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
-    }
+  const user = await UserModel.findOne({ email });
+  if(!user || !(await user.isPasswordVerified(password))) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
+  }
 
-    const token = await generateAuthTokens(user.id);
+  const token = await generateAuthTokens(user.id);
 
-    res.status(httpStatus.OK).send({ user, token });
+  res.status(httpStatus.OK).send({ user, token });
 });
 
 /**
@@ -53,8 +55,8 @@ const login = catchAsync(async (req: Request, res: Response) => {
  * @param {Response} res 
  */
 const logout = catchAsync(async (req: Request, res: Response) => {
-    await removeToken(req.body.refreshToken);
-    res.status(httpStatus.OK).send({ message: 'Logout' });
+  await removeToken(req.body.refreshToken);
+  res.status(httpStatus.OK).send({ message: 'Logout' });
 });
 
 /**
@@ -64,12 +66,16 @@ const logout = catchAsync(async (req: Request, res: Response) => {
  * @param {Response} res 
  */
 const forgotPassword = catchAsync(async (req: Request, res: Response) => {
-    const { email } = req.body;
+  const { email } = req.body;
 
-    const resetPasswordToken = await generateResetPasswordToken(res, email);
-    await sendEmail(email, resetPasswordToken, emailTypes.RESET_PASSWORD);
+  if(!await UserModel.isEmailTaken(email)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'No such email found');
+  }
 
-    res.status(httpStatus.OK).send({ message: 'Reset password email sent successfully' });    
+  const resetPasswordToken = await generateResetPasswordToken(res, email);
+  await sendEmail(email, resetPasswordToken, emailTypes.RESET_PASSWORD);
+  
+  res.status(httpStatus.OK).send({ message: 'Reset password email sent successfully' });    
 });
 
 /**
@@ -80,17 +86,19 @@ const forgotPassword = catchAsync(async (req: Request, res: Response) => {
  * @returns 
  */
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
-    const { password } = req.body;
-    const { token } = req.query;
+  const { password } = req.body;
+  const { token } = req.query;
+  
+  const resetPasswordTokenDoc = await getResetPasswordToken(token as string);
+  if(!resetPasswordTokenDoc) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid token');
+  }
+  const user = await UserModel.findById({ _id: resetPasswordTokenDoc.user });
+  Object.assign(user, { password });
+  await user.save();
+  await removeToken(resetPasswordTokenDoc.id);
 
-    const resetPasswordTokenDoc = await getResetPasswordToken(token as string);
-    if(!resetPasswordTokenDoc) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid token');
-    }
-    await UserModel.updateOne({ _id: resetPasswordTokenDoc.user }, { password: password });
-    await removeToken(resetPasswordTokenDoc.id);
-
-    res.status(httpStatus.OK).send({ message: 'Password reset successfully' });
+  res.status(httpStatus.OK).send({ message: 'Password reset successfully' });
 });
 
 /**
@@ -100,15 +108,15 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
  * @param {Response} res 
  */
 const sendVerifyMail = catchAsync(async (req: Request, res: Response) => {
-    const { email } = req.body;
-
-    const verifyEmailToken = await generateResetPasswordToken(res, email);
-    if(!verifyEmailToken) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'No such email found');
-    }
-    await sendEmail(email, verifyEmailToken, emailTypes.VERIFY_EMAIL);
-
-    res.status(httpStatus.OK).send({ message: 'Verify email sent successfully' });
+  const { email } = req.body;
+  
+  const verifyEmailToken = await generateResetPasswordToken(res, email);
+  if(!verifyEmailToken) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'No such email found');
+  }
+  await sendEmail(email, verifyEmailToken, emailTypes.VERIFY_EMAIL);
+  
+  res.status(httpStatus.OK).send({ message: 'Verify email sent successfully' });
 });
 
 /**
@@ -119,24 +127,24 @@ const sendVerifyMail = catchAsync(async (req: Request, res: Response) => {
  * @returns 
  */
 const verifyEmail = catchAsync(async (req: Request, res: Response) => {
-    const { token } = req.query;
-
-    const verifyEmailTokenDoc = await getVerifyEmailToken(token as string);
-    if(!verifyEmailTokenDoc) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid token');
-    }
-    await UserModel.updateOne({ _id: verifyEmailTokenDoc.user }, { isEmailVerified: true });
-    await removeToken(verifyEmailTokenDoc.id);
-
-    res.status(httpStatus.OK).send({ message: 'Email verified successfully' });
+  const { token } = req.query;
+  
+  const verifyEmailTokenDoc = await getVerifyEmailToken(token as string);
+  if(!verifyEmailTokenDoc) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid token');
+  }
+  await UserModel.updateOne({ _id: verifyEmailTokenDoc.user }, { isEmailVerified: true });
+  await removeToken(verifyEmailTokenDoc.id);
+  
+  res.status(httpStatus.OK).send({ message: 'Email verified successfully' });
 });
 
 export {
-    register,
-    login,
-    logout,
-    forgotPassword,
-    resetPassword,
-    verifyEmail,
-    sendVerifyMail,
+  register,
+  login,
+  logout,
+  forgotPassword,
+  resetPassword,
+  verifyEmail,
+  sendVerifyMail,
 }

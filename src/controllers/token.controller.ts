@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import httpStatus from 'http-status';
 import moment from 'moment';
 import type { Moment } from 'moment';
 import type { ObjectId } from 'mongoose';
@@ -81,11 +80,8 @@ export const generateAuthTokens = async (userId: ObjectId) => {
  * @param {string} email
  * @returns {Promise<string>}
 */
-export const generateResetPasswordToken = async (res: Response, email: string): Promise<string> => {
+export const generateResetPasswordToken = async (_: Response, email: string): Promise<string> => {
     const user = await UserModel.findOne({ email });
-    if (!user) {
-      res.status(httpStatus.NOT_FOUND).json({ message: 'No users found with this email' });
-    }
     const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, 'minutes');
     const resetPasswordToken = generateToken(user.id, expires, tokenTypes.RESET_PASSWORD);
     await saveToken(resetPasswordToken, user.id, expires, tokenTypes.RESET_PASSWORD);

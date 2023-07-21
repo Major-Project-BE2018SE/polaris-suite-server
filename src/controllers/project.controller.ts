@@ -7,6 +7,7 @@ import ApiError from "../helpers/ApiError";
 import { sendEmail } from "../helpers/mailer";
 import { config } from "../config/config";
 import { activitiesCreate } from "./activities.controller";
+import { inviteEmailTemplate } from "../utils/emailTemplate";
 
 const projectCreate = catchAsync(async (req: Request, res: Response) => {
   const project = await ProjectModel.create(req.body);
@@ -86,10 +87,7 @@ const projectInvite = catchAsync(async (req: Request, res: Response) => {
   const acceptUrl = `${config.frontendUrl}/accept-invitation?projectId=${project._id}&email=${req.body.email}`;
   const declineUrl = `${config.frontendUrl}/decline-invitation?projectId=${project._id}&email=${req.body.email}`;
 
-  const body = `Dear user,
-  You have been invited to project ${project.name} as ${req.body.role}.
-  To accept the invitation, click on this link: <a href="${acceptUrl}">${acceptUrl}</a>. To decline the invitation,
-  click on this link: <a href="${declineUrl}">${declineUrl}</a>`;
+  const body = inviteEmailTemplate(acceptUrl, declineUrl, project.name);
 
   await sendEmail(req.body.email, 'Invitation to project', body);
 
