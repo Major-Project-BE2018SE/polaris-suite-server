@@ -5,3 +5,4 @@ export { EnvironmentModel } from "./environment.model";
 export { TestCaseModel } from "./testcase.model";
 export { CommentModel } from "./comment.model";
 export { ActivityModel } from "./activities.model";
+export { SettingModel } from "./settings.model";
