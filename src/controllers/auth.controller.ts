@@ -1,8 +1,8 @@
 import httpStatus from "http-status";
 import type { Request, Response } from "express";
 
-import { UserModel } from "../models";
-import { generateAuthTokens, generateResetPasswordToken, getResetPasswordToken, getVerifyEmailToken, removeToken } from "./token.controller";
+import { SettingModel, UserModel } from "../models";
+import { generateAuthTokens, generateResetPasswordToken, generateVerifyEmailToken, getResetPasswordToken, getVerifyEmailToken, removeToken } from "./token.controller";
 import { sendEmail } from "../helpers/email";
 import { emailTypes } from "../config/constant";
 import { catchAsync } from "../helpers/catchAsync";
@@ -22,6 +22,8 @@ const register = catchAsync(async (req: Request, res: Response) => {
 
   const user = await UserModel.create(req.body);
   const token = await generateAuthTokens(user.id);
+
+  await SettingModel.create({ userId: user.id });
 
   await sendEmail(user.email, token.refresh.token, emailTypes.VERIFY_EMAIL);
 
@@ -108,9 +110,9 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
  * @param {Response} res 
  */
 const sendVerifyMail = catchAsync(async (req: Request, res: Response) => {
-  const { email } = req.body;
+  const { userId, email } = req.body;
   
-  const verifyEmailToken = await generateResetPasswordToken(res, email);
+  const verifyEmailToken = await generateVerifyEmailToken(userId);
   if(!verifyEmailToken) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'No such email found');
   }
