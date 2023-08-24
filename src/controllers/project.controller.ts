@@ -35,7 +35,7 @@ const projectGet = catchAsync(async (req: Request, res: Response) => {
 });
 
 const projectsGet = catchAsync(async (req: Request, res: Response) => {
-  const projects = req.query.status === "all" ? await ProjectModel.find({}) : await ProjectModel.find({ status: { $ne: 'archieved' } });
+  const projects = req.query.status === "all" ? await ProjectModel.find({ ownerID: req.params.userId }) : await ProjectModel.find({ ownerID: req.params.userId, status: { $ne: 'archieved' } });
   res.status(httpStatus.OK).send({ projects });
 });
 

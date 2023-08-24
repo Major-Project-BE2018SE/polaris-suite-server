@@ -7,7 +7,9 @@ import { projectCreate, projectDelete, projectGet, projectInvite, projectInviteA
 const router = express.Router();
 
 router.route('/')
-  .post(auth(), validate(createProject), projectCreate)
+  .post(auth(), validate(createProject), projectCreate);
+
+router.route('/:userId')
   .get(auth(), validate(getProjects), projectsGet);
 
 router.route('/:projectId')
