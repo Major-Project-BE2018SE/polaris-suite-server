@@ -9,7 +9,7 @@ const router = express.Router();
 router.route('/')
   .post(auth(), validate(createProject), projectCreate);
 
-router.route('/:userId')
+router.route('/user/:userId')
   .get(auth(), validate(getProjects), projectsGet);
 
 router.route('/:projectId')
