@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { password } from './custom.validation';
+import { objectId, password } from './custom.validation';
 
 const registerValidate = {
   body: Joi.object().keys({
@@ -43,6 +43,13 @@ const resetPasswordValidate = {
   }),
 };
 
+const VerifyMailSend = {
+  body: Joi.object().keys({
+    email: Joi.string().email().required(),
+    userId: Joi.string().custom(objectId).required(),
+  }),
+};
+
 const verifyEmailValidate = {
   query: Joi.object().keys({
     token: Joi.string().required(),
@@ -57,4 +64,5 @@ export {
   forgotPasswordValidate,
   resetPasswordValidate,
   verifyEmailValidate,
+  VerifyMailSend,
 };

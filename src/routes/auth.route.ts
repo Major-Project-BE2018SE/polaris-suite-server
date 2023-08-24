@@ -1,7 +1,7 @@
 import express from 'express';
 import { forgotPassword, login, logout, register, resetPassword, sendVerifyMail, verifyEmail } from '../controllers/auth.controller';
 import { validate } from '../middlewares/validate';
-import { forgotPasswordValidate, loginValidate, logoutValidate, registerValidate, resetPasswordValidate, verifyEmailValidate } from '../validations/auth.validation';
+import { VerifyMailSend, forgotPasswordValidate, loginValidate, logoutValidate, registerValidate, resetPasswordValidate, verifyEmailValidate } from '../validations/auth.validation';
 
 const router = express.Router();
 
@@ -11,6 +11,6 @@ router.post('/logout', validate(logoutValidate), logout);
 router.post('/forgot-password', validate(forgotPasswordValidate), forgotPassword);
 router.post('/reset-password', validate(resetPasswordValidate), resetPassword);
 router.post('/verify-email', validate(verifyEmailValidate), verifyEmail);
-router.post('/send-verification-email', validate(forgotPasswordValidate), sendVerifyMail);
+router.post('/send-verification-email', validate(VerifyMailSend), sendVerifyMail);
 
 export default router;
