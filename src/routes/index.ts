@@ -9,6 +9,9 @@ import environmentRoute from './environment.route';
 import testcaseRoute from './testcase.route';
 import commentRoute from './comment.route';
 import activitiesRoute from './activities.route';
+import settingsRoute from './settings.route';
+import shortcutRoute from './shortcut.route';
+import dashboardRoute from './dashboard.route';
 
 const router = express.Router();
 
@@ -22,6 +25,9 @@ router.use('/environments', environmentRoute);
 router.use('/testcases', testcaseRoute);
 router.use('/comments', commentRoute);
 router.use('/activities', activitiesRoute);
+router.use('/settings', settingsRoute);
+router.use('/shortcuts', shortcutRoute);
+router.use('/dashboard', dashboardRoute);
 
 /* istanbul ignore next */
 // eslint-disable-next-line no-empty
