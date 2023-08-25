@@ -5,7 +5,7 @@ import type { Request, Response } from 'express';
 import { validate } from '../middlewares/validate';
 import { catchAsync } from '../helpers/catchAsync';
 import { objectId } from '../validations/custom.validation';
-import { ProjectModel, ShortcutModel, TestCaseModel } from '../models';
+import { ProjectModel, ShortcutModel, TestCaseModel, UserModel } from '../models';
 import httpStatus from 'http-status';
 
 const router = express.Router();
@@ -17,7 +17,9 @@ router.get('/:userId',
     })
   }), 
   catchAsync(async (req: Request, res: Response) => {
-    const projects = await ProjectModel.find({ ownerID: req.params.userId });
+
+    const user = await UserModel.findById(req.params.userId);
+    const projects = await ProjectModel.find({ $or: [{ ownerID: user._id }, { members: { $elemMatch: { email: user.email } }}] });
     let totalTestCases = 0;
 
     for (let index = 0; index < projects.length; index++) {

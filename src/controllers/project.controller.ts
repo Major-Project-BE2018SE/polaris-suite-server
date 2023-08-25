@@ -1,7 +1,7 @@
 import httpStatus from "http-status";
 import type { Request, Response } from "express";
 
-import { ProjectModel } from "../models";
+import { ProjectModel, UserModel } from "../models";
 import { catchAsync } from "../helpers/catchAsync";
 import ApiError from "../helpers/ApiError";
 import { sendEmail } from "../helpers/mailer";
@@ -35,7 +35,11 @@ const projectGet = catchAsync(async (req: Request, res: Response) => {
 });
 
 const projectsGet = catchAsync(async (req: Request, res: Response) => {
-  const projects = req.query.status === "all" ? await ProjectModel.find({ ownerID: req.params.userId }) : await ProjectModel.find({ ownerID: req.params.userId, status: { $ne: 'archieved' } });
+  const user = await UserModel.findById(req.params.userId);
+  const projects = 
+    req.query.status === "all" 
+    ? await ProjectModel.find({ $or: [{ ownerID: user._id }, { members: { $elemMatch: { email: user.email } } }] }) 
+    : await ProjectModel.find({ $or: [{ ownerID: user._id }, { members: { $elemMatch: { email: user.email } } }], status: { $ne: 'archieved' } });
   res.status(httpStatus.OK).send({ projects });
 });
 
