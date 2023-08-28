@@ -19,9 +19,9 @@ router.route('/')
   .post(auth(), validate(getDashboardActivity), dashboardActivitiesGet)
 
 router.route('/:projectId')
-  .post(auth(), validate(getProjectActivity), projectActivitiesGet)
+  .get(auth(), validate(getProjectActivity), projectActivitiesGet)
 
 router.route('/:projectId/:testcaseId')
-  .post(auth(), validate(getTestCaseActivity), testcaseActivitiesGet)
+  .get(auth(), validate(getTestCaseActivity), testcaseActivitiesGet)
 
 export default router;
