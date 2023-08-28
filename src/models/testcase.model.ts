@@ -17,13 +17,15 @@ interface ITestCaseSchema extends mongoose.Document {
     createdAt: Date;
   }[];
   testSchema: {
-    name: string;
-    description: string;
-    params: {
-      name: string;
-      value: string;  
-    }[] | null;
-    returns: string | number | boolean | Array<any> | Object | null | undefined;
+    name: string,
+    params: Array<any>,
+    functionType: "inbuilt" | "custom" | "not-function",
+    path: string | null,
+    inbuiltFunction: "suite" | "expect" | "test" | "api" | "call" | "component" | "page" | "polaris-none",
+    returns: string | null,
+    anonymousTestChildren: "next-test" | number | null,
+    siblingTest: "next-test" | number | null, 
+    customSchema: string | null,
   }[];
   comments: string[];
   createdAt: Date;
@@ -88,18 +90,21 @@ const TestCaseSchema = new mongoose.Schema({
   testSchema: {
     type: [{
       name: String,
-      description: String,
-      params: {
-        type: [{
-          name: String,
-          value: String,
-        }] || null,
+      params: Array,
+      functionType: {
+        type: String,
+        enum: ["inbuilt", "custom", "not-function"],
       },
-      returns: {
-        type: String || Number || Boolean || Array || Object || null || undefined,
+      path: String || null,
+      inbuiltFunction: {
+        type: String,
+        enum: ["suite", "expect", "test", "api", "call", "component", "page", "polaris-none"],
       },
+      returns: String || null,
+      anonymousTestChildren: String || Number || null,
+      siblingTest: String || Number || null,
+      customSchema: String || null,
     }],
-    default: [],
   },
   comments: {
     type: [{

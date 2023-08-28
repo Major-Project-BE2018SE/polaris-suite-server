@@ -6,7 +6,38 @@ import { catchAsync } from "../helpers/catchAsync";
 import ApiError from "../helpers/ApiError";
 
 const testCaseCreate = catchAsync(async (req: Request, res: Response) => {
-  const testcase = await TestCaseModel.create(req.body);
+  const testBody = {
+    ...req.body,
+    testSchema: [
+      {
+        name: 'Suite',
+        params: [
+          `suite for ${req.body.name}`,
+          "polaris-anom-function",
+        ],
+        functionType: "inbuilt",
+        path: null,
+        inbuiltFunction: "suite",
+        returns: null,
+        anonymousTestChildren: "next-test",
+        siblingTest: null,
+      },
+      {
+        name: 'Test',
+        params: [
+          `${req.body.name}`,
+          "polaris-anom-function",
+        ],
+        functionType: "inbuilt",
+        path: null,
+        inbuiltFunction: "test",
+        returns: null,
+        anonymousTestChildren: "next-test",
+        siblingTest: null,
+      },
+    ],
+  }
+  const testcase = await TestCaseModel.create(testBody);
 
   res.status(httpStatus.CREATED).json({ testcase });
 });
