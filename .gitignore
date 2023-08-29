@@ -11,3 +11,6 @@
 # env files
 .env
 !.env.example
+
+.GITHUB_PEM
+!.GITHUB_PEM.example

@@ -14,7 +14,7 @@ import {
 const router = express.Router();
 
 router.route('/:userId')
-  .put(auth(), validate(updateSettings), settingUpdate)
+  .patch(auth(), validate(updateSettings), settingUpdate)
   .get(auth(), validate(getSetting), settingGet);
 
 export default router;

@@ -12,6 +12,7 @@ const createProject = {
     })).optional(),
     environments: Joi.array().items(Joi.custom(objectId)).optional(),
     status: Joi.string().valid("in progress", "hold", "draft", "archived", "done").optional(),
+    repo: Joi.string().optional(),
   }),
 };
 
@@ -30,6 +31,7 @@ const updateProject = {
     })).optional(),
     environments: Joi.array().items(Joi.custom(objectId)).optional(),
     status: Joi.string().valid("in progress", "hold", "draft", "archieved", "done").optional(),
+    repo: Joi.string().optional(),
   }).min(1),
 };
 

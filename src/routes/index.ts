@@ -13,6 +13,8 @@ import settingsRoute from './settings.route';
 import shortcutRoute from './shortcut.route';
 import dashboardRoute from './dashboard.route';
 
+import githubRoute from './github.routes';
+
 const router = express.Router();
 
 router.get('/', function (_, res: Response) {
@@ -28,6 +30,8 @@ router.use('/activities', activitiesRoute);
 router.use('/settings', settingsRoute);
 router.use('/shortcuts', shortcutRoute);
 router.use('/dashboard', dashboardRoute);
+
+router.use('/github', githubRoute);
 
 /* istanbul ignore next */
 // eslint-disable-next-line no-empty

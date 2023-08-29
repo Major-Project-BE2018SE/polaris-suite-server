@@ -4,9 +4,7 @@ interface ISettingSchema extends mongoose.Document {
   theme: "light" | "dark" | "system";
   github: {
     enabled: boolean;
-    token: string;
-    username: string;
-    repos: string[];
+    installationId: string;
   };
   userId: string;
 }
@@ -28,24 +26,14 @@ const SettingSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
       },
-      token: {
+      installationId: {
         type: String,
         default: "",
-      },
-      username: {
-        type: String,
-        default: "",
-      },
-      repos: {
-        type: [String],
-        default: [],
-      },
+      }
     },
     default: {
       enabled: false,
-      token: "",
-      username: "",
-      repos: [],
+      installationId: "",
     },
   }
 }, { timestamps: true })

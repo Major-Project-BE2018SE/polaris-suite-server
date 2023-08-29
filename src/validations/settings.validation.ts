@@ -9,9 +9,7 @@ const updateSettings = {
     theme: Joi.string().optional(),
     github: Joi.object({
       enabled: Joi.boolean().optional(),
-      token: Joi.string().optional(),
-      username: Joi.string().optional(),
-      repos: Joi.array().items(Joi.string()).optional(),
+      installationId: Joi.string().optional(),
     }).optional(),
   }).min(1),
 };

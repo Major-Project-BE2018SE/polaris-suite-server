@@ -14,6 +14,7 @@ interface IProjectSchema extends mongoose.Document {
       value: string;
     }[];
   }[];
+  repo: string;
 }
 
 const ProjectSchema = new mongoose.Schema({
@@ -61,7 +62,11 @@ const ProjectSchema = new mongoose.Schema({
     type: String,
     enum: ["archieved", "hold", "in progress", "done", "draft"],
     default: "draft",
-  }
+  },
+  repo: {
+    type: String,
+    default: "",
+  },
 }, { timestamps: true })
 
 export const ProjectModel = mongoose.model('Project', ProjectSchema) as unknown as mongoose.Model<IProjectSchema>;
