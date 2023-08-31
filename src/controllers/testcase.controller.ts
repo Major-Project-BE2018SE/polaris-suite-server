@@ -102,12 +102,64 @@ const testCaseGet = catchAsync(async (req: Request, res: Response) => {
 });
 
 const testCasesAllGet = catchAsync(async (req: Request, res: Response) => {
-  const testcases = await TestCaseModel.find({ linkedProject: req.params.projectId });
+  const testcases = await TestCaseModel.find({ linkedProject: req.params.projectId })
+    .populate([
+      {
+        path: 'comments',
+        populate: [
+          { 
+            path: 'userId',
+            model: 'User',
+          },
+          {
+            path: 'replies',
+            populate: {
+              path: 'userId',
+              model: 'User',
+            }
+          }
+        ],
+      },
+      {
+        path: 'environment',
+        model: 'Environment',
+      },
+      {
+        path: 'linkedProject',
+        model: 'Project',
+      }
+    ]);
   res.status(httpStatus.OK).send({ testcases });
 });
 
 const testCasesGet = catchAsync(async (req: Request, res: Response) => {
-  const testcases = await TestCaseModel.find({ linkedProject: req.params.projectId, environment: req.params.environmentId });
+  const testcases = await TestCaseModel.find({ linkedProject: req.params.projectId, environment: req.params.environmentId })
+    .populate([
+      {
+        path: 'comments',
+        populate: [
+          { 
+            path: 'userId',
+            model: 'User',
+          },
+          {
+            path: 'replies',
+            populate: {
+              path: 'userId',
+              model: 'User',
+            }
+          }
+        ],
+      },
+      {
+        path: 'environment',
+        model: 'Environment',
+      },
+      {
+        path: 'linkedProject',
+        model: 'Project',
+      }
+    ]);
   res.status(httpStatus.OK).send({ testcases });
 });
 
