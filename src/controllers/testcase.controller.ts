@@ -11,30 +11,38 @@ const testCaseCreate = catchAsync(async (req: Request, res: Response) => {
     testSchema: [
       {
         name: 'Suite',
-        params: [
-          `suite for ${req.body.name}`,
-          "polaris-anom-function",
-        ],
-        functionType: "inbuilt",
-        path: null,
-        inbuiltFunction: "suite",
+        params: [`Suite for ${req.body.name}`, "() => {}"],
         returns: null,
-        anonymousTestChildren: "next-test",
-        siblingTest: null,
-      },
-      {
-        name: 'Test',
-        params: [
-          `${req.body.name}`,
-          "polaris-anom-function",
+        customSchema: null,
+        customFunctions: [],
+        children: [
+          {
+            name: 'Test',
+            params: [`${req.body.name}`, "() => {}"],
+            returns: null,
+            customSchema: null,
+            customFunctions: [],
+            children: [
+              {
+                name: 'Expect',
+                params: [2],
+                returns: "next-return",
+                customSchema: null,
+                customFunctions: [],
+                chidren: [],
+              },
+              {
+                name: 'Equals',
+                params: [2],
+                returns: null,
+                customSchema: null,
+                customFunctions: [],
+                chidren: [],
+              },
+            ],
+          }
         ],
-        functionType: "inbuilt",
-        path: null,
-        inbuiltFunction: "test",
-        returns: null,
-        anonymousTestChildren: "next-test",
-        siblingTest: null,
-      },
+      }
     ],
   }
   const testcase = await TestCaseModel.create(testBody);

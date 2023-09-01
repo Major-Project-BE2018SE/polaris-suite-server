@@ -17,15 +17,12 @@ interface ITestCaseSchema extends mongoose.Document {
     createdAt: Date;
   }[];
   testSchema: {
-    name: string,
+    name: String,
     params: Array<any>,
-    functionType: "inbuilt" | "custom" | "not-function",
-    path: string | null,
-    inbuiltFunction: "suite" | "expect" | "test" | "api" | "call" | "component" | "page" | "polaris-none",
     returns: string | null,
-    anonymousTestChildren: "next-test" | number | null,
-    siblingTest: "next-test" | number | null, 
+    children: Array<Pick<ITestCaseSchema, "testSchema">>,
     customSchema: string | null,
+    customFunctions: {name: string, path: string}[],
   }[];
   comments: string[];
   createdAt: Date;
@@ -91,20 +88,11 @@ const TestCaseSchema = new mongoose.Schema({
     type: [{
       name: String,
       params: Array,
-      functionType: {
-        type: String,
-        enum: ["inbuilt", "custom", "not-function"],
-      },
-      path: String || null,
-      inbuiltFunction: {
-        type: String,
-        enum: ["suite", "expect", "test", "api", "call", "component", "page", "polaris-none"],
-      },
       returns: String || null,
-      anonymousTestChildren: String || Number || null,
-      siblingTest: String || Number || null,
+      children: Array,
       customSchema: String || null,
-    }],
+      customFunctions: Array,
+    }]
   },
   comments: {
     type: [{

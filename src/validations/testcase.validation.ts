@@ -36,7 +36,7 @@ const updateTestCase = {
     environmentId: Joi.string().required().custom(objectId),
   }),
   body: Joi.object().keys({
-    name: Joi.string().required(),
+    name: Joi.string().optional(),
     description: Joi.string().optional(),
     creatorId: Joi.string().optional().custom(objectId),
     linkedProject: Joi.string().optional().custom(objectId),
@@ -52,13 +52,14 @@ const updateTestCase = {
       createdAt: Joi.date().required(),
     })).optional(),
     testSchema: Joi.array().items(Joi.object().keys({
+      _id: Joi.string().optional(),
       name: Joi.string().required(),
       description: Joi.string().optional(),
-      params: Joi.array().items(Joi.object().keys({
-        name: Joi.string().required(),
-        value: Joi.string().optional(),
-      })).optional(),
+      params: Joi.array().optional(),
       returns: Joi.any().optional(),
+      customSchema: Joi.any().optional(),
+      customFunctions: Joi.array().optional(),
+      children: Joi.array().optional(),
     })).optional(),
   }).min(1),
 };
