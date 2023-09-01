@@ -22,6 +22,18 @@ const logoutValidate = {
   }),
 };
 
+const loginWithGoogleValidate = {
+  body: Joi.object().keys({
+    googleToken: Joi.string().required(),
+  }),
+};
+
+const loginWithGithubValidate = {
+  body: Joi.object().keys({
+    code: Joi.string().required(),
+  }),
+};
+
 const refreshTokensValidate = {
   body: Joi.object().keys({
     refreshToken: Joi.string().required(),
@@ -65,4 +77,6 @@ export {
   resetPasswordValidate,
   verifyEmailValidate,
   VerifyMailSend,
+  loginWithGoogleValidate,
+  loginWithGithubValidate,
 };

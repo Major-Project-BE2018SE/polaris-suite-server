@@ -26,6 +26,8 @@ const envVarsSchema = Joi.object()
     EMAIL_FROM: Joi.string().description('the from field in the emails sent by the app'),
     GITHUB_CLIENT_ID: Joi.string().description('Github client id for github app'),
     GITHUB_APP_ID: Joi.number().description('Github app id for github app'),
+    GITHUB_OAUTH_CLIENT_ID: Joi.string().description('Github oauth client id for github app'),
+    GITHUB_OAUTH_CLIENT_SECRET: Joi.string().description('Github oauth client secret for github app'),
   })
   .unknown();
 
@@ -68,5 +70,7 @@ export const config = {
   github: {
     clientId: envVars.GITHUB_CLIENT_ID,
     appId: envVars.GITHUB_APP_ID,
+    oauthClientId: envVars.GITHUB_OAUTH_CLIENT_ID,
+    oauthClientSecret: envVars.GITHUB_OAUTH_CLIENT_SECRET,
   },
 };

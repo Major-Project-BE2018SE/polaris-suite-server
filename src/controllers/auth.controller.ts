@@ -7,6 +7,8 @@ import { sendEmail } from "../helpers/email";
 import { emailTypes } from "../config/constant";
 import { catchAsync } from "../helpers/catchAsync";
 import ApiError from "../helpers/ApiError";
+import axios from "axios";
+import { config } from "../config/config";
 
 /**
  * 
@@ -51,6 +53,82 @@ const login = catchAsync(async (req: Request, res: Response) => {
 
   res.status(httpStatus.OK).send({ user, token });
 });
+
+const loginWithGithub = catchAsync(async (req: Request, res: Response) => {
+  const { code } = req.body;
+
+  const { data: tokenData } = await axios.post(
+    `https://github.com/login/oauth/access_token?client_id=${config.github.oauthClientId}&client_secret=${config.github.oauthClientSecret}&code=${code}`,
+    null,
+    {
+      headers: {
+        accept: 'application/json',
+      },
+    }
+  )
+
+  const { data } = await axios.get(
+    `https://api.github.com/user`,
+    {
+      headers: {
+        Authorization: `token ${tokenData.access_token}`,
+      }
+    }
+  )
+  
+  const user = await UserModel.findOne({ email: data.email });
+
+  if(user) {
+    const token = await generateAuthTokens(user.id);
+    res.status(httpStatus.OK).send({ user, token });
+  } else {
+    const user = await UserModel.create({
+      name: data.name,
+      email: data.email,
+      githubToken: tokenData.access_token,
+      isEmailVerified: true,
+    });
+
+    await SettingModel.create({ userId: user.id });
+    await ShortcutModel.create({ userId: user.id });
+
+    const token = await generateAuthTokens(user.id);
+    res.status(httpStatus.OK).send({ user, token });
+  }
+});
+
+const loginWithGoogle = catchAsync(async (req: Request, res: Response) => {
+  const { googleToken } = req.body;
+
+  const { data } = await axios.get(
+    "https://www.googleapis.com/oauth2/v3/userinfo",
+    {
+      headers: {
+        Authorization: `Bearer ${googleToken}`,
+      }
+    }
+  )
+
+  const user = await UserModel.findOne({ email: data.email });
+
+  if(user) {
+    const token = await generateAuthTokens(user.id);
+    res.status(httpStatus.OK).send({ user, token });
+  } else {
+    const user = await UserModel.create({
+      name: data.name,
+      email: data.email,
+      googleToken,
+      isEmailVerified: true,
+    });
+
+    await SettingModel.create({ userId: user.id });
+    await ShortcutModel.create({ userId: user.id });
+
+    const token = await generateAuthTokens(user.id);
+    res.status(httpStatus.OK).send({ user, token });
+  }
+})
 
 /**
  * 
@@ -146,6 +224,8 @@ const verifyEmail = catchAsync(async (req: Request, res: Response) => {
 export {
   register,
   login,
+  loginWithGithub,
+  loginWithGoogle,
   logout,
   forgotPassword,
   resetPassword,

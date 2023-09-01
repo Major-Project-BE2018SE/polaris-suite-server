@@ -6,6 +6,8 @@ interface IUserScheme extends mongoose.Document {
   name: string;
   email: string;
   password: string;
+  googleToken: string;
+  githubToken: string;
   isEmailVerified: boolean;
   isPasswordVerified(password: string): Promise<boolean>;
 }
@@ -43,6 +45,15 @@ const UserSchema = new mongoose.Schema({
       }
     },
     private: true,
+    default: "polaris12345",
+  },
+  googleToken: {
+    type: String,
+    default: "",
+  },
+  githubToken: {
+    type: String,
+    default: "",
   },
   isEmailVerified: {
     type: Boolean,
