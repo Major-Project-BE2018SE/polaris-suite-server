@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npx tsc && nodemon dist/src/index.js",
     "dev": "nodemon src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "polaris src/temp"
   },
   "repository": {
     "type": "git",
@@ -30,6 +30,7 @@
     "@types/passport-jwt": "^3.0.8",
     "@types/validator": "^13.7.15",
     "nodemon": "^2.0.22",
+    "polaris-suite": "^0.7.1",
     "ts-node": "^10.9.1",
     "tslib": "^2.5.0",
     "typescript": "^5.0.4"

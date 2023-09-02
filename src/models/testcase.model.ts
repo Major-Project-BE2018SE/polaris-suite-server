@@ -78,7 +78,6 @@ const TestCaseSchema = new mongoose.Schema({
       initiatedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        required: true,
       },
       createdAt: Date,
     }],

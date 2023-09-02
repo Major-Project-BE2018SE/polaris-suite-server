@@ -4,6 +4,7 @@ import type { Request, Response } from "express";
 import { CommentModel, ProjectModel, TestCaseModel } from "../models";
 import { catchAsync } from "../helpers/catchAsync";
 import ApiError from "../helpers/ApiError";
+import { testCaseRunObject } from "../helpers/testCase";
 
 const testCaseCreate = catchAsync(async (req: Request, res: Response) => {
   const testBody = {
@@ -226,6 +227,58 @@ const testCaseUpdate = catchAsync(async (req: Request, res: Response) => {
   res.status(httpStatus.OK).send({ testcase });
 });
 
+const testCaseRun = catchAsync(async (req: Request, res: Response) => {
+  const testcase = await TestCaseModel.findById(req.params.testcaseId);
+
+  if(!testcase) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'TestCase not found');
+  }
+
+  await testCaseRunObject(testcase.testSchema);
+
+  const newTestRuns = [{
+    result: '',
+    status: 'pass',
+    logs: [
+      'run logs',
+    ],
+    initiatedBy: req.body.userId,
+    createdAt: new Date(),
+  }, ...testcase.testRuns];
+
+  Object.assign(testcase, { testRuns: newTestRuns, recentRun: newTestRuns[0].status });
+
+  await testcase.save().then(testcase => testcase
+    .populate([
+      {
+        path: 'comments',
+        populate: [
+          {
+            path: 'userId',
+            model: 'User',
+          },
+          {
+            path: 'replies',
+            populate: {
+              path: 'userId',
+              model: 'User',
+            }
+          }
+        ],
+      },
+      {
+        path: 'environment',
+        model: 'Environment',
+      },
+      {
+        path: 'linkedProject',
+        model: 'Project',
+      }
+    ]));
+
+  res.status(httpStatus.OK).send({ testcase });
+});
+
 export {
   testCaseCreate,
   testCaseAllCreate,
@@ -234,4 +287,5 @@ export {
   testCasesAllGet,
   testCaseDelete,
   testCaseUpdate,
+  testCaseRun,
 }

@@ -3,6 +3,12 @@ import { app } from './app';
 import { config } from './config/config';
 import { Server, IncomingMessage, ServerResponse } from 'http';
 
+global.logMessages = {
+  result: '',
+  logs: [],
+  status: '',
+};
+
 let server: Server<typeof IncomingMessage, typeof ServerResponse>;
 
 // connecting to mongodb using mongoose
