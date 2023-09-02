@@ -38,8 +38,8 @@ const projectsGet = catchAsync(async (req: Request, res: Response) => {
   const user = await UserModel.findById(req.params.userId);
   const projects = 
     req.query.status === "all" 
-    ? await ProjectModel.find({ $or: [{ ownerID: user._id }, { members: { $elemMatch: { email: user.email } } }] }) 
-    : await ProjectModel.find({ $or: [{ ownerID: user._id }, { members: { $elemMatch: { email: user.email } } }], status: { $ne: 'archieved' } });
+    ? await ProjectModel.find({ $or: [{ ownerID: user._id }, { members: { $elemMatch: { email: user.email } } }] }).populate('environments') 
+    : await ProjectModel.find({ $or: [{ ownerID: user._id }, { members: { $elemMatch: { email: user.email } } }], status: { $ne: 'archieved' } }).populate('environments');
   res.status(httpStatus.OK).send({ projects });
 });
 
